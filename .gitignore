@@ -5,3 +5,7 @@ artifacts
 typechain-types
 coverage
 coverage.json
+bin/
+obj/
+oracle/bin/
+oracle/obj/

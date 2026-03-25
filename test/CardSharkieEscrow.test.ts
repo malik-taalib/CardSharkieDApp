@@ -389,7 +389,17 @@ describe("CardSharkieEscrow", function () {
       const { escrow, player1, player2 } = await loadFixture(gameActiveFixture);
       await time.increase(86401);
 
-      const tx = await escrow.expireGame(0);
+      const p1Before = await ethers.provider.getBalance(player1.address);
+      const p2Before = await ethers.provider.getBalance(player2.address);
+
+      await escrow.expireGame(0);
+
+      const p1After = await ethers.provider.getBalance(player1.address);
+      const p2After = await ethers.provider.getBalance(player2.address);
+
+      expect(p1After - p1Before).to.equal(WAGER);
+      expect(p2After - p2Before).to.equal(WAGER);
+
       const game = await escrow.getGame(0);
       expect(game.state).to.equal(5); // Expired
     });
@@ -459,17 +469,27 @@ describe("CardSharkieEscrow", function () {
       ).to.be.revertedWith("Invalid limits");
     });
 
-    it("should withdraw fees", async function () {
+    it("should withdraw only accumulated fees, not player funds", async function () {
       const { escrow, owner, oracle, player1, player2 } = await loadFixture(gameActiveFixture);
+
+      // Create a second game that stays open (player funds in contract)
+      await escrow.connect(player1).createGame("Tonk", { value: WAGER });
+
+      // Resolve game 0
       await escrow.connect(oracle).resolveGame(0, player1.address, GAME_DATA_HASH);
 
       const pot = WAGER * 2n;
       const fee = (pot * BigInt(FEE_BPS)) / 10000n;
 
+      // withdrawFees should only withdraw the fee, not the open game's wager
       await expect(escrow.connect(owner).withdrawFees()).to.changeEtherBalance(owner, fee);
+
+      // Contract should still hold the open game's wager
+      const balance = await ethers.provider.getBalance(await escrow.getAddress());
+      expect(balance).to.equal(WAGER);
     });
 
-    it("should reject withdraw with no balance", async function () {
+    it("should reject withdraw with no accumulated fees", async function () {
       const { escrow, owner } = await loadFixture(deployFixture);
       await expect(escrow.connect(owner).withdrawFees()).to.be.revertedWith("No fees to withdraw");
     });
@@ -511,6 +531,42 @@ describe("CardSharkieEscrow", function () {
       const stats = await escrow.getContractStats();
       expect(stats._totalGames).to.equal(1);
       expect(stats._totalVolume).to.equal(WAGER * 2n);
+    });
+  });
+
+  // =========================================================================
+  //  REGRESSION TESTS (from audit)
+  // =========================================================================
+
+  describe("Regression", function () {
+    it("should reject resolving same game twice", async function () {
+      const { escrow, oracle, player1 } = await loadFixture(gameActiveFixture);
+      await escrow.connect(oracle).resolveGame(0, player1.address, GAME_DATA_HASH);
+      await expect(
+        escrow.connect(oracle).resolveGame(0, player1.address, GAME_DATA_HASH)
+      ).to.be.revertedWith("Game not active");
+    });
+
+    it("should prevent re-dispute after resolveDispute", async function () {
+      const { escrow, owner, player2 } = await loadFixture(gameResolvedFixture);
+      // Dispute within window
+      await escrow.connect(player2).disputeGame(0);
+      // Owner resolves dispute (sets new resolvedAt)
+      await escrow.connect(owner).resolveDispute(0, player2.address);
+      // Advance past dispute window from the new resolvedAt
+      await time.increase(3601);
+      // Should no longer be disputable
+      await expect(
+        escrow.connect(player2).disputeGame(0)
+      ).to.be.revertedWith("Dispute window closed");
+    });
+
+    it("should not allow withdrawFees to drain player funds", async function () {
+      const { escrow, owner, player1 } = await loadFixture(gameCreatedFixture);
+      // There's an open game with player funds, but no fees
+      await expect(
+        escrow.connect(owner).withdrawFees()
+      ).to.be.revertedWith("No fees to withdraw");
     });
   });
 });

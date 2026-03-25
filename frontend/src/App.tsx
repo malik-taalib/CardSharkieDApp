@@ -156,8 +156,14 @@ function CreateGamePanel({ onSuccess }: { onSuccess: () => void }) {
 function GameDetailModal({ game, onClose }: { game: GameData; onClose: () => void }) {
   const { address } = useAccount();
   const stateName = STATE_NAMES[game.state] || "Unknown";
+  const { data: feeBps } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: "platformFeeBps",
+  });
   const pot = game.wagerAmount * 2n;
-  const payout = pot - (pot * 500n / 10000n);
+  const fee = (pot * (feeBps ?? 500n)) / 10000n;
+  const payout = pot - fee;
   const { writeContract, isPending } = useWriteContract();
 
   const isCreator = address?.toLowerCase() === game.player1.toLowerCase();

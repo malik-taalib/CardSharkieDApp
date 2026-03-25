@@ -59,6 +59,7 @@ contract CardSharkieEscrow {
     uint256 public gameCounter;
     uint256 public totalVolume;
     uint256 public totalFees;
+    uint256 public accumulatedFees;
 
     mapping(uint256 => Game) public games;
     mapping(address => uint256[]) public playerGames;
@@ -190,6 +191,7 @@ contract CardSharkieEscrow {
 
         totalVolume += pot;
         totalFees += fee;
+        accumulatedFees += fee;
 
         address loser = _winner == game.player1 ? game.player2 : game.player1;
         playerWins[_winner]++;
@@ -242,6 +244,7 @@ contract CardSharkieEscrow {
 
         game.winner = _winner;
         game.state = GameState.Resolved;
+        game.resolvedAt = block.timestamp;
 
         // Note: In a dispute, the original payout already went out.
         // The dispute resolution would handle off-chain compensation
@@ -324,11 +327,12 @@ contract CardSharkieEscrow {
     }
 
     function withdrawFees() external onlyOwner {
-        uint256 balance = address(this).balance;
-        require(balance > 0, "No fees to withdraw");
-        (bool success, ) = owner.call{value: balance}("");
+        uint256 toWithdraw = accumulatedFees;
+        require(toWithdraw > 0, "No fees to withdraw");
+        accumulatedFees = 0;
+        (bool success, ) = owner.call{value: toWithdraw}("");
         require(success, "Withdrawal failed");
-        emit FundsWithdrawn(owner, balance);
+        emit FundsWithdrawn(owner, toWithdraw);
     }
 
     function transferOwnership(address _newOwner) external onlyOwner {
