@@ -436,11 +436,7 @@ export default function App() {
 
       <header style={{ borderBottom: "1px solid rgba(212,175,55,0.12)", padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, position: "relative", zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4af37" strokeWidth="1.5">
-            <rect x="3" y="3" width="13" height="18" rx="2" />
-            <rect x="8" y="3" width="13" height="18" rx="2" fill="rgba(212,175,55,0.15)" stroke="#d4af37" />
-            <text x="12" y="15" fill="#d4af37" fontSize="8" fontWeight="bold" textAnchor="middle" stroke="none">♠</text>
-          </svg>
+          <img src="/cardsharkie-logo.png" alt="Card Sharkie" width="36" height="36" style={{ borderRadius: "50%" }} />
           <div>
             <span style={{ fontWeight: 700, fontSize: 18, letterSpacing: "-0.5px" }}>Card Sharkie</span>
             <span style={{ fontSize: 10, color: "#d4af37", marginLeft: 8, padding: "2px 6px", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 4, fontWeight: 600, verticalAlign: "middle" }}>dApp</span>
