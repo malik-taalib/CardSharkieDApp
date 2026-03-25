@@ -1,0 +1,26 @@
+export const CONTRACT_ADDRESS = "0x1eAf6CFdBAA561006D0059E3dDa7a01f18730F33" as const;
+
+export const CONTRACT_ABI = [
+  { inputs: [{ name: "_oracle", type: "address" }, { name: "_feeBps", type: "uint256" }], stateMutability: "nonpayable", type: "constructor" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }, { indexed: true, name: "winner", type: "address" }], name: "DisputeResolved", type: "event" },
+  { anonymous: false, inputs: [{ indexed: false, name: "newFeeBps", type: "uint256" }], name: "FeeUpdated", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "to", type: "address" }, { indexed: false, name: "amount", type: "uint256" }], name: "FundsWithdrawn", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }], name: "GameCancelled", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }, { indexed: true, name: "player1", type: "address" }, { indexed: false, name: "wagerAmount", type: "uint256" }, { indexed: false, name: "gameType", type: "string" }], name: "GameCreated", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }, { indexed: true, name: "disputer", type: "address" }], name: "GameDisputed", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }], name: "GameExpired", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }, { indexed: true, name: "player2", type: "address" }], name: "GameJoined", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "gameId", type: "uint256" }, { indexed: true, name: "winner", type: "address" }, { indexed: false, name: "payout", type: "uint256" }, { indexed: false, name: "fee", type: "uint256" }], name: "GameResolved", type: "event" },
+  { anonymous: false, inputs: [{ indexed: true, name: "newOracle", type: "address" }], name: "OracleUpdated", type: "event" },
+  { inputs: [{ name: "_gameId", type: "uint256" }], name: "cancelGame", outputs: [], stateMutability: "nonpayable", type: "function" },
+  { inputs: [{ name: "_gameType", type: "string" }], name: "createGame", outputs: [{ name: "gameId", type: "uint256" }], stateMutability: "payable", type: "function" },
+  { inputs: [], name: "gameCounter", outputs: [{ name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [], name: "getContractStats", outputs: [{ name: "_totalGames", type: "uint256" }, { name: "_totalVolume", type: "uint256" }, { name: "_totalFees", type: "uint256" }, { name: "_contractBalance", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [{ name: "_gameId", type: "uint256" }], name: "getGame", outputs: [{ components: [{ name: "player1", type: "address" }, { name: "player2", type: "address" }, { name: "wagerAmount", type: "uint256" }, { name: "createdAt", type: "uint256" }, { name: "resolvedAt", type: "uint256" }, { name: "state", type: "uint8" }, { name: "winner", type: "address" }, { name: "gameType", type: "string" }, { name: "gameDataHash", type: "bytes32" }], name: "", type: "tuple" }], stateMutability: "view", type: "function" },
+  { inputs: [{ name: "_offset", type: "uint256" }, { name: "_limit", type: "uint256" }], name: "getOpenGames", outputs: [{ name: "", type: "uint256[]" }], stateMutability: "view", type: "function" },
+  { inputs: [{ name: "_player", type: "address" }], name: "getPlayerGames", outputs: [{ name: "", type: "uint256[]" }], stateMutability: "view", type: "function" },
+  { inputs: [{ name: "_player", type: "address" }], name: "getPlayerStats", outputs: [{ name: "wins", type: "uint256" }, { name: "losses", type: "uint256" }, { name: "totalGames", type: "uint256" }], stateMutability: "view", type: "function" },
+  { inputs: [{ name: "_gameId", type: "uint256" }], name: "joinGame", outputs: [], stateMutability: "payable", type: "function" },
+  { inputs: [], name: "platformFeeBps", outputs: [{ name: "", type: "uint256" }], stateMutability: "view", type: "function" },
+  { stateMutability: "payable", type: "receive" },
+] as const;
