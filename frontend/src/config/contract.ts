@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x1eAf6CFdBAA561006D0059E3dDa7a01f18730F33" as const;
+export const CONTRACT_ADDRESS = "0xdd49bcb2cB24d89E876888764c0ABeF7B086dd75" as const;
 
 export const CONTRACT_ABI = [
   { inputs: [{ name: "_oracle", type: "address" }, { name: "_feeBps", type: "uint256" }], stateMutability: "nonpayable", type: "constructor" },
